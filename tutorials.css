@@ -4,25 +4,117 @@
 	font-family: 'Trebuchet MS';
 }
 
+body {
+	background-color: #EEE;
+}
+
+
+
 nav {
-	min-height: 100%;
-	float: left;
-	width: 200px;
-	background-color: #555;
-}
-
-nav h1 {
-	color: #DDD;
-}
-
-nav h2 {
-	color: #BBB;
-}
-
-nav h3 {
-	color: #BBB;
+	position: fixed;
+	top:      0;
+	bottom:   0;
+	width:    250px;
+	background-color: #454545;
 }
 
 nav a {
 	text-decoration: none;
+	display: block;
 }
+
+nav ul {
+	list-style-type: none;
+}
+
+nav li {
+	border-bottom: 1px solid #AAA;
+	padding: 30px;
+}
+
+nav li a {
+	font-size: 24px;
+	color:     #EEE;
+}
+
+nav li li {
+	border:  none;
+	padding: 15px 0 0 0;
+	color:   #0F0;
+}
+
+nav li li a {
+	font-size: 20px;
+	color:     #EEE;
+}
+
+nav li li li {
+	border: none;
+	padding: 15px 0 0 20px;
+	color: #F00;
+}
+
+nav li li li:last-of-type {
+	padding-bottom: 15px;
+}
+
+nav li li li a {
+	font-size: 16px;
+	color:     #BBB;
+}
+
+
+
+main {
+	margin-left: 250px;
+	text-align:  center;
+}
+
+main a#website-title {
+	display:   inline-block;
+	padding:   10px;
+	color:     #D97;
+	font-size: 42px;
+	text-decoration: none;
+}
+
+article {
+	margin:    50px auto 100px auto;
+	max-width: 800px;
+	color:     #555;
+}
+
+article img:first-of-type {
+	width:  200px;
+	height: auto;
+}
+
+article h1 {
+	margin: 50px 0;
+	font-size: 48px;
+}
+
+article p {
+	margin:      20px auto;
+	max-width:   600px;
+	line-height: 30px;
+	font-size:   20px;
+	text-align:  left;
+}
+
+/*article section {
+	margin: 50px 0;
+}*/
+
+article section h2 {
+	margin:     0 auto;
+	padding:    50px 0 0 0;
+	max-width:  600px;
+	text-align: left;
+	font-size:  32px;
+}
+
+article section h3 {
+	
+}
+
