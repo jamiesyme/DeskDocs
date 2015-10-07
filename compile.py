@@ -1,4 +1,6 @@
 
+import os.path
+
 #
 # This is a VERY specialized markdown implementation.
 #
@@ -145,7 +147,8 @@ class HtmlWriter:
 		self.add(html)
 		
 	def export(self, path):
-		with open(path) as file:
+		os.makedirs(os.path.dirname(path), exist_ok=True)
+		with open(path, 'w') as file:
 			file.write(self.html)
 		
 
@@ -240,19 +243,106 @@ topics.append( Topic('Communicate',      'content/communicate.md') )
 topics.append( Topic('Mobile',           'content/mobile.md') )
 topics.append( Topic('Troubleshooting',  'content/troubleshooting.md') )
 
+def makeNavSafe(nameToTransform):
+	nameToTransform = nameToTransform.strip()
+	nameToTransform = nameToTransform.lower()
+	nameToTransform = '-'.join(nameToTransform.split())
+	return nameToTransform
+	
+def makeHref(topic, subtopic, heading):
+	href = 'tuts/'
+	href += makeNavSafe(topic.title) + '/'
+	href += makeNavSafe(subtopic.title) + '.html'
+	if heading is not None:
+		href += '#' + makeNavSafe(heading.title)
+	return href
+
+def addNavBar(html, curTopic, curSubtopic):
+	# Start the nav bar
+	html.open('<nav>')
+	html.open('<ul>')
+	
+	# Add every topic
+	for topic in topics:
+		topicHref = makeHref(topic, topic.subtopics[-1], None)
+		html.open('<li>')
+		html.add('<a href="' + topicHref + '">' + topic.title + '</a>')
+		
+		# Expand the current topic
+		if topic is curTopic:
+			html.open('<ul>')
+			
+			# Add every subtopic
+			for subtopic in topic.subtopics:
+				subHref = makeHref(topic, subtopic, None)
+				html.open('<li>')
+				html.add('<a href="' + subHref + '">' + subtopic.title + '</a>')
+				
+				# Expand the current subtopic
+				if subtopic is curSubtopic:
+					html.open('<ul>')
+					
+					# Add all the second-level headings
+					for content in subtopic.content:
+						if type(content) is Topic.Heading and content.level == 2:
+							secHref = makeHref(topic, subtopic, content)
+							html.open('<li>')
+							html.add('<a href="' + secHref + '">' + content.title + '</a>')
+							html.close('</li>')
+							
+					html.close('</ul>')
+				html.close('</li>')
+			html.close('</ul>')
+		html.close('</li>')
+	html.close('</ul>')
+	html.close('</nav>')
+	
+def addContent(html, content):
+	if type(content) is Topic.Heading:
+		hText = 'h' + str(content.level)
+		html.add('<' + hText + '>' + content.title + '</' + hText + '>')
+	elif type(content) is Topic.Image:
+		srcAttr = 'src="' + content.src + '"'
+		altAttr = 'alt="' + content.altText + '"'
+		html.add('<img ' + srcAttr + ' ' + altText + '>')
+	elif type(content) is Topic.Paragraph:
+		html.add('<p>' + content.text + '</p')
+
 for topic in topics:
 	for subtopic in topic.subtopics:
+		# Get things rolling
 		html = HtmlWriter()
 		html.open('<html>')
 		html.open('<head>')
 		html.add('<meta charset="utf-8">')
 		html.add('<title>Desk Docs</title>')
-		html.add('<link rel="stylesheet" href="tutorials.css">')
+		html.add('<link rel="stylesheet" href="../../tutorials.css">')
 		html.close('</head>')
 		html.open('<body>')
+		addNavBar(html, topic, subtopic)
+		html.open('<main>')
+		html.add('<a id="website-title" href="#">Skype User Manual</a>')
+		html.open('<article>')
 		
+		# If an image is the second content item, it is the subtopic icon
+		skip = 0
+		if len(subtopic.content) > 1 and type(subtopic.content[1]) is Topic.Image:
+			addContent(html, subtopic.content[1])
+			addContent(html, subtopic.content[0])
+			skip = 2
+			
+		# Add the rest of the subtopic content
+		for content in subtopic.content:
+			if skip > 0:
+				skip -= 1
+				continue
+			addContent(html, content)
+			
+		# Close everything up
+		html.close('</article>')
+		html.close('</main>')
 		html.close('</body>')
 		html.close('</html>')
-		html.export('path.html')
+		html.export( makeHref(topic, subtopic, None) )
 
 	
