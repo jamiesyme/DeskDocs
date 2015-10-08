@@ -54,25 +54,25 @@ class MarkdownParser:
 						# Get the link info
 						linkText_si = i + 1
 						linkText_ei = paragraph.index(']', linkText_si)
-						linkText    = pargraph[linkText_si : linkText_ei]
+						linkText    = paragraph[linkText_si : linkText_ei]
 						linkSrc_si  = linkText_ei + 2
 						if paragraph[linkSrc_si - 1] != '(':
 							continue
 						linkSrc_ei  = paragraph.index(')', linkSrc_si)
-						linkSrc     = pargraph[linkSrc_si : linkSrc_ei]
+						linkSrc     = paragraph[linkSrc_si : linkSrc_ei]
 						
 						# Transform the link and replace the text
 						newText = self.transformLink(linkSrc, linkText)
 						link_si = i
 						link_ei = linkSrc_ei
-						paragraph.replace(paragraph[link_si, link_ei], newText)
+						paragraph.replace(paragraph[link_si : link_ei], newText)
 						i += len(newText)
 					
 					# Parse the text for emphasis
 					# TODO
 						
 					# Tell the client about our paragraph
-					self.onPargraph(paragraph)
+					self.onParagraph(paragraph)
 					paragraph = None
 					
 				# Move on to the next line
@@ -109,16 +109,17 @@ class MarkdownParser:
 				
 				# Get the src
 				src_si = line.index('(', altText_ei) + 1
-				src_ei = line.index(' ', src_ei)
+				src_ei = line.index(' ', src_si)
 				src = line[src_si : src_ei]
 				
 				# Get the caption
-				caption_si = line.index('"', src_ei)
-				caption_ei = line.index('"', caption_si + 1)
+				caption_si = line.index('"', src_ei) + 1
+				caption_ei = line.index('"', caption_si)
 				caption = line[caption_si : caption_ei]
 				
 				# Tell the client
 				self.onImage(src, altText, caption)
+				continue
 				
 			# Must be a paragraph
 			paragraph = line
@@ -219,8 +220,7 @@ class Topic:
 	def onHeading(self, level, text):
 		if level == 1:
 			self.subtopics.append( Topic.Subtopic(text) )
-		else:
-			self.subtopics[-1].content.append( Topic.Heading(text, level) )
+		self.subtopics[-1].content.append( Topic.Heading(text, level) )
 		
 	def onImage(self, src, altText, caption):
 		self.subtopics[-1].content.append( Topic.Image(src, altText, caption) )
@@ -250,8 +250,7 @@ def makeNavSafe(nameToTransform):
 	return nameToTransform
 	
 def makeHref(topic, subtopic, heading):
-	href = 'tuts/'
-	href += makeNavSafe(topic.title) + '/'
+	href  = makeNavSafe(topic.title) + '/'
 	href += makeNavSafe(subtopic.title) + '.html'
 	if heading is not None:
 		href += '#' + makeNavSafe(heading.title)
@@ -264,7 +263,7 @@ def addNavBar(html, curTopic, curSubtopic):
 	
 	# Add every topic
 	for topic in topics:
-		topicHref = makeHref(topic, topic.subtopics[-1], None)
+		topicHref = '../' + makeHref(topic, topic.subtopics[0], None)
 		html.open('<li>')
 		html.add('<a href="' + topicHref + '">' + topic.title + '</a>')
 		
@@ -274,7 +273,7 @@ def addNavBar(html, curTopic, curSubtopic):
 			
 			# Add every subtopic
 			for subtopic in topic.subtopics:
-				subHref = makeHref(topic, subtopic, None)
+				subHref = '../' + makeHref(topic, subtopic, None)
 				html.open('<li>')
 				html.add('<a href="' + subHref + '">' + subtopic.title + '</a>')
 				
@@ -285,7 +284,7 @@ def addNavBar(html, curTopic, curSubtopic):
 					# Add all the second-level headings
 					for content in subtopic.content:
 						if type(content) is Topic.Heading and content.level == 2:
-							secHref = makeHref(topic, subtopic, content)
+							secHref = '../' + makeHref(topic, subtopic, content)
 							html.open('<li>')
 							html.add('<a href="' + secHref + '">' + content.title + '</a>')
 							html.close('</li>')
@@ -300,13 +299,17 @@ def addNavBar(html, curTopic, curSubtopic):
 def addContent(html, content):
 	if type(content) is Topic.Heading:
 		hText = 'h' + str(content.level)
-		html.add('<' + hText + '>' + content.title + '</' + hText + '>')
+		idAttr = 'id="' + makeNavSafe(content.title) + '"'
+		html.add('<' + hText + ' ' + idAttr + '>' + content.title + '</' + hText + '>')
 	elif type(content) is Topic.Image:
 		srcAttr = 'src="' + content.src + '"'
 		altAttr = 'alt="' + content.altText + '"'
-		html.add('<img ' + srcAttr + ' ' + altText + '>')
+		html.open('<figure>')
+		html.add('<img ' + srcAttr + ' ' + altAttr + '>')
+		html.add('<figcaption>' + content.caption + '</figcaption>')
+		html.close('</figure>')
 	elif type(content) is Topic.Paragraph:
-		html.add('<p>' + content.text + '</p')
+		html.add('<p>' + content.text + '</p>')
 
 for topic in topics:
 	for subtopic in topic.subtopics:
@@ -343,6 +346,6 @@ for topic in topics:
 		html.close('</main>')
 		html.close('</body>')
 		html.close('</html>')
-		html.export( makeHref(topic, subtopic, None) )
+		html.export( 'tuts/' + makeHref(topic, subtopic, None) )
 
 	
