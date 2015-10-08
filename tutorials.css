@@ -80,7 +80,8 @@ main a#website-title {
 
 article {
 	margin:    50px auto 100px auto;
-	max-width: 800px;
+	padding:   0 30px;
+	max-width: 860px;
 	color:     #555;
 }
 
@@ -102,11 +103,7 @@ article p {
 	text-align:  left;
 }
 
-/*article section {
-	margin: 50px 0;
-}*/
-
-article section h2 {
+article h2 {
 	margin:     0 auto;
 	padding:    50px 0 0 0;
 	max-width:  600px;
@@ -114,7 +111,7 @@ article section h2 {
 	font-size:  32px;
 }
 
-article section h3 {
+article h3 {
 	
 }
 
