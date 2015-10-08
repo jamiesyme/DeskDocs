@@ -7,6 +7,10 @@
 body {
 	text-align: center;
 	margin-top: 10px;
+	background-color: #2ABDF3;
+	background-image: url('bg.jpg');
+	background-position: center bottom;
+	background-repeat: no-repeat;
 }
 
 a#website-title {
@@ -20,11 +24,11 @@ a#website-title {
 #all-sections {
 	margin: 20px 0;
 	padding: 20px 0;
-	background-color: #E3E3E3;
+	background-color: #FFF;
 	position: static;
 	width: 100%;
-	border-top: 1px solid #BBB;
-	border-bottom: 1px solid #BBB;
+	border-top:    1px solid #888;
+	border-bottom: 1px solid #888;
 }
 
 section {
@@ -63,7 +67,7 @@ section li:last-of-type {
 section a {
 	text-decoration: none;
 	font-size: 20px;
-	color: #AAA;
+	color: #999;
 	display: block;
 	padding: 5px 0;
 	font-family: 'Courier New';
@@ -71,5 +75,26 @@ section a {
 
 section a:hover {
 	color: #333;
+}
+
+article {
+	max-width: 860px;
+	margin: 0 auto;
+	padding: 10px 30px 250px 30px;
+	text-align: left;
+	color: #222;
+	background-color: #FFF;
+}
+
+article h2 {
+	text-align: center;
+	margin: 10px;
+	font-size: 36px;
+	font-weight: normal;
+}
+
+article p {
+	padding-bottom: 30px;
+	font-size: 20px;
 }
 
